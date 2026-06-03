@@ -3,1283 +3,919 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐾 PetCad - Cadastro de Pets</title>
+    <title>PetCare - Sistema de Cadastro de Pets</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons para ícones modernos -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary: #6c5ce7;
-            --primary-dark: #5a4bd1;
-            --secondary: #00cec9;
-            --accent: #fd79a8;
-            --bg: #f8f9fa;
-            --card-bg: #ffffff;
-            --text: #2d3436;
-            --text-light: #636e72;
-            --border: #e0e0e0;
-            --success: #00b894;
-            --danger: #e17055;
-            --warning: #fdcb6e;
-            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.12);
-            --radius: 16px;
-            --radius-sm: 10px;
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #e8ecf1 0%, #f0f3f6 30%, #fdf6f0 60%, #f5f0ff 100%);
-            background-attachment: fixed;
-            min-height: 100vh;
-            color: var(--text);
-            line-height: 1.6;
-            padding: 20px;
-        }
-
-        /* Decorative background blobs */
-        body::before {
-            content: '';
-            position: fixed;
-            top: -200px;
-            right: -200px;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(108, 92, 231, 0.07) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 0;
-        }
-        body::after {
-            content: '';
-            position: fixed;
-            bottom: -150px;
-            left: -150px;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(253, 121, 168, 0.06) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .container {
-            max-width: 1300px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: 35px;
-        }
-        .header .logo {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 2.4rem;
-            font-weight: 800;
-            color: var(--primary);
-            letter-spacing: -0.5px;
-        }
-        .header .logo .paw {
-            font-size: 2.8rem;
-            animation: bounce 2s ease-in-out infinite;
-        }
-        @keyframes bounce {
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-            30% {
-                transform: translateY(-15px);
-            }
-            50% {
-                transform: translateY(0);
-            }
-            70% {
-                transform: translateY(-8px);
-            }
-        }
-        .header .subtitle {
-            color: var(--text-light);
-            font-size: 1.05rem;
-            margin-top: 4px;
-            font-weight: 400;
-        }
-
-        /* Dashboard Cards */
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-        .stat-card {
-            background: var(--card-bg);
-            border-radius: var(--radius-sm);
-            padding: 20px 18px;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            transition: var(--transition);
-            cursor: default;
-            border: 1px solid transparent;
-        }
-        .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-lg);
-            border-color: #eee;
-        }
-        .stat-card .icon-circle {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            flex-shrink: 0;
-        }
-        .stat-card .icon-circle.purple {
-            background: #f3f0ff;
-        }
-        .stat-card .icon-circle.teal {
-            background: #e6faf9;
-        }
-        .stat-card .icon-circle.pink {
-            background: #fff0f5;
-        }
-        .stat-card .icon-circle.orange {
-            background: #fff8f0;
-        }
-        .stat-card .info .number {
-            font-size: 1.7rem;
-            font-weight: 700;
-            color: var(--text);
-            line-height: 1;
-        }
-        .stat-card .info .label {
-            font-size: 0.82rem;
-            color: var(--text-light);
-            margin-top: 3px;
-        }
-
-        /* Main Layout */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr 1.6fr;
-            gap: 24px;
-            align-items: start;
-        }
-
-        @media (max-width: 900px) {
-            .main-grid {
-                grid-template-columns: 1fr;
-            }
-            .header .logo {
-                font-size: 1.8rem;
-            }
-            .header .logo .paw {
-                font-size: 2rem;
-            }
-            .stats-row {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        @media (max-width: 500px) {
-            .stats-row {
-                grid-template-columns: 1fr;
-            }
-            body {
-                padding: 10px;
-            }
-        }
-
-        /* Card */
-        .card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 28px 24px;
-            box-shadow: var(--shadow);
-            border: 1px solid #f0f0f0;
-            transition: var(--transition);
-        }
-        .card h2 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text);
-        }
-        .card h2 .emoji {
-            font-size: 1.5rem;
-        }
-
-        /* Form */
-        .form-group {
-            margin-bottom: 16px;
-        }
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            font-size: 0.88rem;
-            margin-bottom: 5px;
-            color: var(--text);
-            letter-spacing: 0.2px;
-        }
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px 14px;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 0.95rem;
-            transition: var(--transition);
-            background: #fafbfc;
-            color: var(--text);
-            font-family: inherit;
-        }
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
-            background: #fff;
-        }
-        .form-group input.error,
-        .form-group select.error {
-            border-color: var(--danger);
-            box-shadow: 0 0 0 4px rgba(225, 112, 85, 0.1);
-        }
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-        @media (max-width: 500px) {
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-        .error-msg {
-            color: var(--danger);
-            font-size: 0.78rem;
-            margin-top: 3px;
-            display: none;
-            font-weight: 500;
-        }
-        .error-msg.visible {
-            display: block;
-            animation: fadeIn 0.2s ease;
-        }
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-4px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Buttons */
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            border: none;
-            transition: var(--transition);
-            letter-spacing: 0.2px;
-            font-family: inherit;
-        }
-        .btn-primary {
-            background: var(--primary);
-            color: #fff;
-            width: 100%;
-            box-shadow: 0 4px 14px rgba(108, 92, 231, 0.35);
-        }
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 22px rgba(108, 92, 231, 0.45);
-        }
-        .btn-primary:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3);
-        }
-        .btn-outline {
-            background: #fff;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-        }
-        .btn-outline:hover {
-            background: #f9f7ff;
-        }
-        .btn-sm {
-            padding: 7px 14px;
-            font-size: 0.8rem;
-            border-radius: 20px;
-        }
-        .btn-edit {
-            background: #fff;
-            color: var(--primary);
-            border: 1.5px solid var(--primary);
-        }
-        .btn-edit:hover {
-            background: #f3f0ff;
-        }
-        .btn-delete {
-            background: #fff;
-            color: var(--danger);
-            border: 1.5px solid var(--danger);
-        }
-        .btn-delete:hover {
-            background: #fff5f3;
-        }
-        .btn-cancel {
-            background: #f1f2f6;
-            color: var(--text-light);
-            border: 1.5px solid #ddd;
-            margin-top: 8px;
-            width: 100%;
-        }
-        .btn-cancel:hover {
-            background: #e8e9ed;
-        }
-
-        /* Pet type selector */
-        .pet-type-selector {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .pet-type-option {
-            flex: 1;
-            min-width: 60px;
-            padding: 10px 8px;
-            border: 2px solid var(--border);
-            border-radius: var(--radius-sm);
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
-            background: #fafbfc;
-            font-weight: 500;
-            font-size: 0.85rem;
-            user-select: none;
-        }
-        .pet-type-option:hover {
-            border-color: #c4b8f0;
-            background: #fdfcff;
-        }
-        .pet-type-option.selected {
-            border-color: var(--primary);
-            background: #f3f0ff;
-            color: var(--primary);
-            font-weight: 700;
-            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.08);
-        }
-        .pet-type-option .type-emoji {
-            display: block;
-            font-size: 1.6rem;
-            margin-bottom: 2px;
-        }
-
-        /* Table */
-        .table-wrapper {
-            overflow-x: auto;
-            max-height: 520px;
-            overflow-y: auto;
-            scrollbar-width: thin;
-            scrollbar-color: #ddd transparent;
-        }
-        .table-wrapper::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        .table-wrapper::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .table-wrapper::-webkit-scrollbar-thumb {
-            background: #ddd;
-            border-radius: 10px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.9rem;
-        }
-        table thead {
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
-        table thead th {
-            background: #f8f9fc;
-            padding: 14px 12px;
-            text-align: left;
-            font-weight: 700;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: var(--text-light);
-            border-bottom: 2px solid #eee;
-            white-space: nowrap;
-        }
-        table tbody td {
-            padding: 12px;
-            border-bottom: 1px solid #f2f2f2;
-            vertical-align: middle;
-        }
-        table tbody tr {
-            transition: var(--transition);
-        }
-        table tbody tr:hover {
-            background: #fdfdff;
-        }
-        .pet-avatar-cell {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .pet-mini-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            flex-shrink: 0;
-        }
-        .pet-mini-avatar.dog {
-            background: #fff3e0;
-        }
-        .pet-mini-avatar.cat {
-            background: #f3e5f5;
-        }
-        .pet-mini-avatar.bird {
-            background: #e8f5e9;
-        }
-        .pet-mini-avatar.fish {
-            background: #e3f2fd;
-        }
-        .pet-mini-avatar.other {
-            background: #fce4ec;
-        }
-        .badge {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            letter-spacing: 0.2px;
-        }
-        .badge-dog {
-            background: #fff3e0;
-            color: #e67e22;
-        }
-        .badge-cat {
-            background: #f3e5f5;
-            color: #8e44ad;
-        }
-        .badge-bird {
-            background: #e8f5e9;
-            color: #27ae60;
-        }
-        .badge-fish {
-            background: #e3f2fd;
-            color: #2980b9;
-        }
-        .badge-other {
-            background: #fce4ec;
-            color: #c0392b;
-        }
-        .actions-cell {
-            display: flex;
-            gap: 6px;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: #bbb;
-        }
-        .empty-state .empty-emoji {
-            font-size: 4rem;
-            display: block;
-            margin-bottom: 10px;
-        }
-        .empty-state p {
-            font-size: 1rem;
-            color: #999;
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            top: 25px;
-            right: 25px;
-            z-index: 999;
-            background: #fff;
-            padding: 16px 22px;
-            border-radius: var(--radius-sm);
-            box-shadow: var(--shadow-lg);
-            font-weight: 600;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transform: translateX(120%);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border-left: 4px solid var(--success);
-        }
-        .toast.show {
-            transform: translateX(0);
-        }
-        .toast.error-toast {
-            border-left-color: var(--danger);
-        }
-        @media (max-width: 500px) {
-            .toast {
-                left: 15px;
-                right: 15px;
-                font-size: 0.82rem;
-            }
-        }
-
-        /* Search */
-        .search-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        .search-bar input {
-            flex: 1;
-            padding: 10px 14px;
-            border: 2px solid var(--border);
-            border-radius: 50px;
-            font-size: 0.9rem;
-            background: #fafbfc;
-            transition: var(--transition);
-            font-family: inherit;
-        }
-        .search-bar input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.08);
-            background: #fff;
-        }
-        .search-bar select {
-            padding: 10px 14px;
-            border: 2px solid var(--border);
-            border-radius: 50px;
-            font-size: 0.9rem;
-            background: #fafbfc;
-            cursor: pointer;
-            font-family: inherit;
-            transition: var(--transition);
-        }
-        .search-bar select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        /* Confirm modal */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.45);
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        .modal-overlay.active {
-            opacity: 1;
-            pointer-events: all;
-        }
-        .modal-dialog {
-            background: #fff;
-            border-radius: var(--radius);
-            padding: 30px 25px;
-            text-align: center;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: var(--shadow-lg);
-        }
-        .modal-dialog h3 {
-            margin-bottom: 8px;
-            font-size: 1.2rem;
-        }
-        .modal-dialog p {
-            color: var(--text-light);
-            margin-bottom: 18px;
-            font-size: 0.9rem;
-        }
-        .modal-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-
-        .highlight-row {
-            animation: highlightAnim 0.8s ease;
-        }
-        @keyframes highlightAnim {
-            0% {
-                background: #fdf6e3;
-            }
-            100% {
-                background: transparent;
-            }
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <div class="logo">
-                <span class="paw">🐾</span> PetCad
-            </div>
-            <p class="subtitle">Cadastro inteligente para seu melhor amigo</p>
-        </div>
-
-        <!-- Stats -->
-        <div class="stats-row" id="statsRow">
-            <div class="stat-card">
-                <div class="icon-circle purple">📋</div>
-                <div class="info">
-                    <div class="number" id="statTotal">0</div>
-                    <div class="label">Pets cadastrados</div>
+    <!-- Header -->
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="bg-brand-500 text-white p-2 rounded-xl shadow-md shadow-brand-100">
+                    <i data-lucide="paw-print" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900 tracking-tight">PetCare</h1>
+                    <p class="text-xs text-slate-500 font-medium">Gestão e Cadastro de Pets</p>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="icon-circle teal">🐕</div>
-                <div class="info">
-                    <div class="number" id="statDogs">0</div>
-                    <div class="label">Cachorros</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="icon-circle pink">🐈</div>
-                <div class="info">
-                    <div class="number" id="statCats">0</div>
-                    <div class="label">Gatos</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="icon-circle orange">✨</div>
-                <div class="info">
-                    <div class="number" id="statOthers">0</div>
-                    <div class="label">Outros pets</div>
-                </div>
+            <div class="flex items-center gap-3">
+                <button onclick="exportarDados()" class="flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-lg transition-colors">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Exportar JSON</span>
+                </button>
+                <button onclick="abrirModalCadastro()" class="flex items-center gap-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 px-4 py-2 rounded-lg shadow-sm shadow-brand-100 transition-colors">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Cadastrar Pet</span>
+                </button>
             </div>
         </div>
+    </header>
 
-        <!-- Main -->
-        <div class="main-grid">
-            <!-- Form Card -->
-            <div class="card" id="formCard">
-                <h2><span class="emoji">📝</span> <span id="formTitle">Cadastrar Pet</span></h2>
-                <form id="petForm" novalidate>
-                    <input type="hidden" id="editId" value="">
+    <!-- Conteúdo Principal -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <!-- Dashboard rápido / Métricas -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+                <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                    <i data-lucide="users" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total de Pets</p>
+                    <h3 id="stat-total" class="text-2xl font-bold text-slate-800">0</h3>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+                <div class="p-3 bg-amber-50 text-amber-600 rounded-xl">
+                    <i data-lucide="dog" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Cães</p>
+                    <h3 id="stat-caes" class="text-2xl font-bold text-slate-800">0</h3>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+                <div class="p-3 bg-purple-50 text-purple-600 rounded-xl">
+                    <i data-lucide="cat" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Gatos</p>
+                    <h3 id="stat-gatos" class="text-2xl font-bold text-slate-800">0</h3>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center gap-4">
+                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                    <i data-lucide="calendar" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Média de Idade</p>
+                    <h3 id="stat-idade" class="text-2xl font-bold text-slate-800">0 anos</h3>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Tipo de Pet -->
-                    <div class="form-group">
-                        <label>Tipo de Pet *</label>
-                        <div class="pet-type-selector" id="petTypeSelector">
-                            <div class="pet-type-option selected" data-type="dog">
-                                <span class="type-emoji">🐕</span> Cachorro
-                            </div>
-                            <div class="pet-type-option" data-type="cat">
-                                <span class="type-emoji">🐈</span> Gato
-                            </div>
-                            <div class="pet-type-option" data-type="bird">
-                                <span class="type-emoji">🐦</span> Ave
-                            </div>
-                            <div class="pet-type-option" data-type="fish">
-                                <span class="type-emoji">🐟</span> Peixe
-                            </div>
-                            <div class="pet-type-option" data-type="other">
-                                <span class="type-emoji">🐹</span> Outro
-                            </div>
-                        </div>
-                        <input type="hidden" id="petType" value="dog">
-                        <span class="error-msg" id="errorType">Selecione um tipo de pet</span>
+        <!-- Filtros e Barra de Pesquisa -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
+            <!-- Pesquisa -->
+            <div class="relative w-full md:max-w-md">
+                <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5"></i>
+                <input type="text" id="input-busca" oninput="filtrarPets()" placeholder="Buscar pet por nome, raça ou temperamento..." class="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all">
+            </div>
+
+            <!-- Filtros Rápidos -->
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                <select id="filtro-especie" onchange="filtrarPets()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all cursor-pointer">
+                    <option value="">Todas as Espécies</option>
+                    <option value="Cachorro">Cachorro</option>
+                    <option value="Gato">Gato</option>
+                    <option value="Ave">Ave</option>
+                    <option value="Roedor">Roedor</option>
+                    <option value="Outro">Outro</option>
+                </select>
+
+                <select id="filtro-porte" onchange="filtrarPets()" class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 transition-all cursor-pointer">
+                    <option value="">Todos os Portes</option>
+                    <option value="Pequeno">Porte Pequeno</option>
+                    <option value="Médio">Porte Médio</option>
+                    <option value="Grande">Porte Grande</option>
+                </select>
+
+                <button onclick="limparFiltros()" class="text-sm font-semibold text-slate-500 hover:text-slate-800 px-3 py-2 transition-colors">
+                    Limpar
+                </button>
+            </div>
+        </div>
+
+        <!-- Feedback de Notificação -->
+        <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+            <div class="bg-slate-900 text-white px-5 py-3 rounded-xl shadow-lg flex items-center gap-3">
+                <div id="toast-icon-container" class="text-brand-500">
+                    <i id="toast-icon" data-lucide="check-circle" class="w-5 h-5"></i>
+                </div>
+                <span id="toast-message" class="text-sm font-medium">Operação realizada com sucesso!</span>
+            </div>
+        </div>
+
+        <!-- Grade de Pets -->
+        <div id="grid-pets" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Gerado via JavaScript -->
+        </div>
+
+        <!-- Estado Vazio (Caso não haja pets) -->
+        <div id="estado-vazio" class="hidden flex-col items-center justify-center text-center py-20 bg-white rounded-3xl border border-slate-100 shadow-sm">
+            <div class="bg-slate-100 p-4 rounded-full text-slate-400 mb-4">
+                <i data-lucide="dog" class="w-12 h-12"></i>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-1">Nenhum pet encontrado</h3>
+            <p class="text-slate-500 text-sm max-w-sm mb-6">Cadastre novos pets ou ajuste seus filtros de busca para ver os resultados aqui.</p>
+            <button onclick="abrirModalCadastro()" class="flex items-center gap-2 text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 px-5 py-2.5 rounded-xl shadow-sm transition-colors">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Cadastrar Primeiro Pet</span>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-white border-t border-slate-100 py-6 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-slate-400 font-medium">
+            &copy; 2026 PetCare. Desenvolvido para proteção e amor aos animais.
+        </div>
+    </footer>
+
+    <!-- MODAL DE CADASTRO / EDIÇÃO -->
+    <div id="modal-cadastro" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 max-w-2xl w-full max-h-[90vh] overflow-y-auto transform scale-95 transition-transform duration-300">
+            <!-- Cabeçalho do Modal -->
+            <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white z-10">
+                <div class="flex items-center gap-3">
+                    <div class="bg-brand-100 text-brand-700 p-2 rounded-xl">
+                        <i id="modal-icon" data-lucide="plus-circle" class="w-5 h-5"></i>
                     </div>
+                    <div>
+                        <h2 id="modal-titulo" class="text-lg font-bold text-slate-900">Novo Cadastro de Pet</h2>
+                        <p class="text-xs text-slate-500 font-medium">Insira as informações do bichinho</p>
+                    </div>
+                </div>
+                <button onclick="fecharModalCadastro()" class="text-slate-400 hover:text-slate-600 p-1 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
 
+            <!-- Formulário -->
+            <form id="form-pet" onsubmit="salvarPet(event)" class="p-6 space-y-6">
+                <input type="hidden" id="pet-id">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <!-- Nome -->
-                    <div class="form-group">
-                        <label for="petName">Nome do Pet *</label>
-                        <input type="text" id="petName" placeholder="Ex: Bud, Luna, Thor..." maxlength="50">
-                        <span class="error-msg" id="errorName">Informe o nome do pet</span>
+                    <div>
+                        <label for="pet-nome" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Nome do Pet *</label>
+                        <input type="text" id="pet-nome" required placeholder="Ex: Frederico, Pipoca..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all">
                     </div>
 
-                    <!-- Raça e Idade -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="petBreed">Raça</label>
-                            <input type="text" id="petBreed" placeholder="Ex: Golden Retriever" maxlength="40">
+                    <!-- Espécie -->
+                    <div>
+                        <label for="pet-especie" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Espécie *</label>
+                        <select id="pet-especie" required onchange="ajustarSugestoesRaca()" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all cursor-pointer">
+                            <option value="">Selecione...</option>
+                            <option value="Cachorro">Cachorro</option>
+                            <option value="Gato">Gato</option>
+                            <option value="Ave">Ave</option>
+                            <option value="Roedor">Roedor</option>
+                            <option value="Outro">Outro</option>
+                        </select>
+                    </div>
+
+                    <!-- Raça -->
+                    <div>
+                        <label for="pet-raca" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Raça *</label>
+                        <input type="text" id="pet-raca" required placeholder="Ex: Golden Retriever, Srd..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all">
+                    </div>
+
+                    <!-- Idade -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label for="pet-idade" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Idade *</label>
+                            <input type="number" id="pet-idade" required min="0" max="50" placeholder="Ex: 2" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all">
                         </div>
-                        <div class="form-group">
-                            <label for="petAge">Idade *</label>
-                            <input type="text" id="petAge" placeholder="Ex: 2 anos" maxlength="20">
-                            <span class="error-msg" id="errorAge">Informe a idade do pet</span>
+                        <div>
+                            <label for="pet-unidade-idade" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Período *</label>
+                            <select id="pet-unidade-idade" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all cursor-pointer">
+                                <option value="Anos">Anos</option>
+                                <option value="Meses">Meses</option>
+                            </select>
                         </div>
                     </div>
 
-                    <!-- Tutor -->
-                    <div class="form-group">
-                        <label for="ownerName">Nome do Tutor *</label>
-                        <input type="text" id="ownerName" placeholder="Nome completo do tutor" maxlength="60">
-                        <span class="error-msg" id="errorOwner">Informe o nome do tutor</span>
+                    <!-- Porte -->
+                    <div>
+                        <label for="pet-porte" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Porte do Animal *</label>
+                        <select id="pet-porte" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all cursor-pointer">
+                            <option value="">Selecione...</option>
+                            <option value="Pequeno">Pequeno</option>
+                            <option value="Médio">Médio</option>
+                            <option value="Grande">Grande</option>
+                        </select>
                     </div>
 
-                    <!-- Telefone e Email -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="ownerPhone">Telefone *</label>
-                            <input type="tel" id="ownerPhone" placeholder="(11) 99999-9999" maxlength="20">
-                            <span class="error-msg" id="errorPhone">Informe um telefone válido</span>
-                        </div>
-                        <div class="form-group">
-                            <label for="ownerEmail">E-mail</label>
-                            <input type="email" id="ownerEmail" placeholder="tutor@email.com" maxlength="60">
-                            <span class="error-msg" id="errorEmail">Informe um e-mail válido</span>
+                    <!-- Gênero -->
+                    <div>
+                        <label for="pet-genero" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Gênero *</label>
+                        <select id="pet-genero" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all cursor-pointer">
+                            <option value="">Selecione...</option>
+                            <option value="Macho">Macho</option>
+                            <option value="Fêmea">Fêmea</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Temperamento (Chips) -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Temperamento (Selecione um ou mais)</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" onclick="toggleTemperamento('Dócil', this)" class="btn-temp px-4 py-1.5 rounded-full border border-slate-200 text-slate-600 bg-slate-50 hover:bg-slate-100 text-xs font-semibold transition-all">Dócil</button>
+                        <button type="button" onclick="toggleTemperamento('Brincalhão', this)" class="btn-temp px-4 py-1.5 rounded-full border border-slate-200 text-slate-600 bg-slate-50 hover:bg-slate-100 text-xs font-semibold transition-all">Brincalhão</button>
+                        <button type="button" onclick="toggleTemperamento('Protetor', this)" class="btn-temp px-4 py-1.5 rounded-full border border-slate-200 text-slate-600 bg-slate-50 hover:bg-slate-100 text-xs font-semibold transition-all">Protetor</button>
+                        <button type="button" onclick="toggleTemperamento('Calmo', this)" class="btn-temp px-4 py-1.5 rounded-full border border-slate-200 text-slate-600 bg-slate-50 hover:bg-slate-100 text-xs font-semibold transition-all">Calmo</button>
+                        <button type="button" onclick="toggleTemperamento('Agitado', this)" class="btn-temp px-4 py-1.5 rounded-full border border-slate-200 text-slate-600 bg-slate-50 hover:bg-slate-100 text-xs font-semibold transition-all">Agitado</button>
+                        <button type="button" onclick="toggleTemperamento('Tímido', this)" class="btn-temp px-4 py-1.5 rounded-full border border-slate-200 text-slate-600 bg-slate-50 hover:bg-slate-100 text-xs font-semibold transition-all">Tímido</button>
+                    </div>
+                    <input type="hidden" id="pet-temperamento" name="temperamento">
+                </div>
+
+                <!-- Foto do Pet -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Foto do Pet</label>
+                    <div class="space-y-3">
+                        <input type="url" id="pet-foto-url" placeholder="Insira o link/URL da imagem ou use as fotos sugeridas abaixo..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all">
+                        
+                        <!-- Sugestão de Fotos Fofas -->
+                        <div>
+                            <p class="text-[11px] text-slate-400 font-semibold mb-2 uppercase tracking-wide">Sugestões Rápidas:</p>
+                            <div class="grid grid-cols-5 gap-2" id="sugestoes-imagens">
+                                <!-- Preenchido dinamicamente de acordo com a espécie -->
+                            </div>
                         </div>
                     </div>
+                </div>
 
-                    <button type="submit" class="btn btn-primary" id="submitBtn">
-                        💾 Salvar Pet
+                <!-- Observações / Cuidados Especiais -->
+                <div>
+                    <label for="pet-obs" class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">Observações ou Cuidados Especiais</label>
+                    <textarea id="pet-obs" rows="3" placeholder="Ex: Possui alergia a frango, precisa de medicação diária para artrose..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all resize-none"></textarea>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="pt-4 border-t border-slate-100 flex gap-3 justify-end">
+                    <button type="button" onclick="fecharModalCadastro()" class="px-5 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 transition-all">
+                        Cancelar
                     </button>
-                    <button type="button" class="btn btn-cancel" id="cancelBtn" style="display:none;">
-                        ✖ Cancelar Edição
+                    <button type="submit" class="px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-brand-600 hover:bg-brand-700 shadow-sm transition-all">
+                        Salvar Informações
                     </button>
-                </form>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE VISUALIZAÇÃO DE DETALHES -->
+    <div id="modal-detalhes" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-100 max-w-md w-full overflow-hidden transform scale-95 transition-transform duration-300">
+            <!-- Capa/Imagem do Pet no Detalhe -->
+            <div class="h-56 relative bg-slate-100">
+                <img id="detalhe-imagem" class="w-full h-full object-cover" src="" alt="Imagem do Pet">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                
+                <button onclick="fecharModalDetalhes()" class="absolute top-4 right-4 text-white hover:text-white/80 p-2 bg-black/30 hover:bg-black/50 rounded-full backdrop-blur-sm transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+
+                <div class="absolute bottom-4 left-4 right-4 text-white">
+                    <span id="detalhe-especie" class="px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider bg-brand-600 mr-2"></span>
+                    <h2 id="detalhe-nome" class="text-2xl font-bold mt-1"></h2>
+                </div>
             </div>
 
-            <!-- List Card -->
-            <div class="card">
-                <h2><span class="emoji">📋</span> Pets Cadastrados</h2>
-                <div class="search-bar">
-                    <input type="text" id="searchInput" placeholder="🔍 Buscar por nome, raça ou tutor...">
-                    <select id="filterType">
-                        <option value="all">Todos</option>
-                        <option value="dog">🐕 Cachorros</option>
-                        <option value="cat">🐈 Gatos</option>
-                        <option value="bird">🐦 Aves</option>
-                        <option value="fish">🐟 Peixes</option>
-                        <option value="other">🐹 Outros</option>
-                    </select>
+            <!-- Dados do Pet -->
+            <div class="p-6 space-y-5">
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span class="block text-slate-400 font-semibold text-xs uppercase tracking-wider">Raça</span>
+                        <strong id="detalhe-raca" class="text-slate-700"></strong>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span class="block text-slate-400 font-semibold text-xs uppercase tracking-wider">Idade</span>
+                        <strong id="detalhe-idade" class="text-slate-700"></strong>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span class="block text-slate-400 font-semibold text-xs uppercase tracking-wider">Gênero</span>
+                        <strong id="detalhe-genero" class="text-slate-700"></strong>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <span class="block text-slate-400 font-semibold text-xs uppercase tracking-wider">Porte</span>
+                        <strong id="detalhe-porte" class="text-slate-700"></strong>
+                    </div>
                 </div>
-                <div class="table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Pet</th>
-                                <th>Tipo</th>
-                                <th>Raça</th>
-                                <th>Idade</th>
-                                <th>Tutor</th>
-                                <th>Contato</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="petsTableBody">
-                            <tr class="empty-state">
-                                <td colspan="7">
-                                    <span class="empty-emoji">🐾</span>
-                                    <p>Nenhum pet cadastrado ainda</p>
-                                    <p style="font-size:0.8rem;">Cadastre o primeiro pet no formulário ao lado!</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+                <!-- Temperamentos -->
+                <div>
+                    <span class="block text-slate-400 font-semibold text-xs uppercase tracking-wider mb-2">Comportamento</span>
+                    <div id="detalhe-temperamento" class="flex flex-wrap gap-1.5">
+                        <!-- Chips -->
+                    </div>
+                </div>
+
+                <!-- Observações -->
+                <div class="bg-amber-50/50 border border-amber-100 p-4 rounded-2xl">
+                    <span class="flex items-center gap-1.5 text-amber-800 font-bold text-xs uppercase tracking-wider mb-1">
+                        <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600"></i>
+                        Anotações importantes
+                    </span>
+                    <p id="detalhe-obs" class="text-sm text-slate-600 leading-relaxed"></p>
+                </div>
+
+                <div class="pt-4 border-t border-slate-100 flex gap-2 justify-end">
+                    <button id="detalhe-btn-excluir" class="flex items-center gap-2 text-sm font-semibold text-red-600 hover:text-red-700 hover:bg-red-50 px-4 py-2.5 rounded-xl transition-all">
+                        <i data-lucide="trash" class="w-4 h-4"></i>
+                        <span>Excluir</span>
+                    </button>
+                    <button id="detalhe-btn-editar" class="flex items-center gap-2 text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 px-5 py-2.5 rounded-xl shadow-sm transition-all">
+                        <i data-lucide="edit" class="w-4 h-4"></i>
+                        <span>Editar Cadastro</span>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div class="modal-overlay" id="deleteModal">
-        <div class="modal-dialog">
-            <h3>🗑️ Confirmar exclusão</h3>
-            <p>Tem certeza que deseja remover <strong id="deletePetName"></strong>? Esta ação não pode ser desfeita.</p>
-            <div class="modal-buttons">
-                <button class="btn btn-delete btn-sm" id="confirmDeleteBtn">Sim, excluir</button>
-                <button class="btn btn-outline btn-sm" id="cancelDeleteBtn">Cancelar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Toast -->
-    <div class="toast" id="toast">
-        <span id="toastIcon">✅</span>
-        <span id="toastMsg">Pet cadastrado com sucesso!</span>
-    </div>
-
+    <!-- JAVASCRIPT COMPLETO -->
     <script>
-        (function() {
-            // ============ DOM ELEMENTS ============
-            const petForm = document.getElementById('petForm');
-            const editId = document.getElementById('editId');
-            const petTypeInput = document.getElementById('petType');
-            const petName = document.getElementById('petName');
-            const petBreed = document.getElementById('petBreed');
-            const petAge = document.getElementById('petAge');
-            const ownerName = document.getElementById('ownerName');
-            const ownerPhone = document.getElementById('ownerPhone');
-            const ownerEmail = document.getElementById('ownerEmail');
-            const submitBtn = document.getElementById('submitBtn');
-            const cancelBtn = document.getElementById('cancelBtn');
-            const formTitle = document.getElementById('formTitle');
-            const petsTableBody = document.getElementById('petsTableBody');
-            const searchInput = document.getElementById('searchInput');
-            const filterType = document.getElementById('filterType');
-            const deleteModal = document.getElementById('deleteModal');
-            const deletePetName = document.getElementById('deletePetName');
-            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
-            const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
-            const toast = document.getElementById('toast');
-            const toastIcon = document.getElementById('toastIcon');
-            const toastMsg = document.getElementById('toastMsg');
-            const petTypeSelector = document.getElementById('petTypeSelector');
+        // Banco de Dados em Memória (Com persistência no LocalStorage para boa usabilidade local)
+        let pets = JSON.parse(localStorage.getItem('petcare_pets')) || [];
+        
+        // Temperamentos ativos no formulário
+        let temperamentosSelecionados = [];
 
-            // Stats
-            const statTotal = document.getElementById('statTotal');
-            const statDogs = document.getElementById('statDogs');
-            const statCats = document.getElementById('statCats');
-            const statOthers = document.getElementById('statOthers');
+        // Imagens padrão fofas de banco de dados para evitar links quebrados
+        const imagensPadrao = {
+            Cachorro: [
+                "https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&q=80&w=200",
+                "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&q=80&w=200",
+                "https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&q=80&w=200",
+                "https://images.unsplash.com/photo-1537151608828-ea2b117b6f86?auto=format&fit=crop&q=80&w=200",
+                "https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80&w=200"
+            ],
+            Gato: [
+                "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=200",
+                "https://images.unsplash.com/photo-1533738363-b7f9aef128ce?auto=format&fit=crop&q=80&w=200",
+                "https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&q=80&w=200",
+                "https://images.unsplash.com/photo-1495360010541-f48722b34f7d?auto=format&fit=crop&q=80&w=200",
+                "https://images.unsplash.com/photo-1548247416-ec66f4900b2e?auto=format&fit=crop&q=80&w=200"
+            ],
+            Ave: [
+                "https://images.unsplash.com/photo-1452570053594-1b985d6ea890?auto=format&fit=crop&q=80&w=200",
+                "https://images.unsplash.com/photo-1522858547137-f1dcee557076?auto=format&fit=crop&q=80&w=200",
+                "https://images.unsplash.com/photo-1480044965905-02098d419e96?auto=format&fit=crop&q=80&w=200"
+            ],
+            Roedor: [
+                "https://images.unsplash.com/photo-1425082661705-1834bfd09dca?auto=format&fit=crop&q=80&w=200",
+                "https://images.unsplash.com/photo-1534840698216-09a56416b255?auto=format&fit=crop&q=80&w=200"
+            ],
+            Outro: [
+                "https://images.unsplash.com/photo-1504198453319-5ce911bafcde?auto=format&fit=crop&q=80&w=200"
+            ]
+        };
 
-            // Error spans
-            const errorName = document.getElementById('errorName');
-            const errorAge = document.getElementById('errorAge');
-            const errorOwner = document.getElementById('errorOwner');
-            const errorPhone = document.getElementById('errorPhone');
-            const errorEmail = document.getElementById('errorEmail');
-            const errorType = document.getElementById('errorType');
+        // Dados de teste iniciais caso o banco local esteja limpo
+        const dadosIniciais = [
+            {
+                id: "1",
+                nome: "Max",
+                especie: "Cachorro",
+                raca: "Golden Retriever",
+                idade: 3,
+                unidadeIdade: "Anos",
+                porte: "Grande",
+                genero: "Macho",
+                temperamento: ["Dócil", "Brincalhão"],
+                fotoUrl: "https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&q=80&w=400",
+                obs: "Tem muito medo de fogos de artifício e é extremamente carinhoso com crianças."
+            },
+            {
+                id: "2",
+                nome: "Mia",
+                especie: "Gato",
+                raca: "Persa",
+                idade: 2,
+                unidadeIdade: "Anos",
+                porte: "Pequeno",
+                genero: "Fêmea",
+                temperamento: ["Calmo", "Tímido"],
+                fotoUrl: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&q=80&w=400",
+                obs: "Gosta de deitar no sol pela manhã. Tem intolerância à ração que contém corantes artificiais."
+            },
+            {
+                id: "3",
+                nome: "Teo",
+                especie: "Ave",
+                raca: "Calopsita",
+                idade: 8,
+                unidadeIdade: "Meses",
+                porte: "Pequeno",
+                genero: "Macho",
+                temperamento: ["Agitado", "Brincalhão"],
+                fotoUrl: "https://images.unsplash.com/photo-1522858547137-f1dcee557076?auto=format&fit=crop&q=80&w=400",
+                obs: "Adora cantar pela manhã e assobios rítmicos. Solto somente em ambientes totalmente fechados."
+            }
+        ];
 
-            // ============ STATE ============
-            let pets = [];
-            let pendingDeleteId = null;
-            let toastTimeout;
+        // Inicializar aplicação
+        window.addEventListener('DOMContentLoaded', () => {
+            if (pets.length === 0) {
+                pets = [...dadosIniciais];
+                salvarLocalStorage();
+            }
+            renderizarPets();
+            lucide.createIcons();
+        });
 
-            // ============ STORAGE ============
-            function loadPets() {
-                try {
-                    const data = localStorage.getItem('petcad_pets');
-                    pets = data ? JSON.parse(data) : [];
-                } catch (e) {
-                    pets = [];
-                }
+        // Salvar localstorage
+        function salvarLocalStorage() {
+            localStorage.setItem('petcare_pets', JSON.stringify(pets));
+        }
+
+        // Renderizar a tela de Pets
+        function renderizarPets(petsFiltrados = null) {
+            const lista = petsFiltrados || pets;
+            const grid = document.getElementById('grid-pets');
+            const estadoVazio = document.getElementById('estado-vazio');
+
+            atualizarEstatisticas();
+
+            if (lista.length === 0) {
+                grid.classList.add('hidden');
+                estadoVazio.classList.remove('hidden');
+                estadoVazio.classList.add('flex');
+                return;
             }
 
-            function savePets() {
-                localStorage.setItem('petcad_pets', JSON.stringify(pets));
-            }
+            grid.classList.remove('hidden');
+            estadoVazio.classList.add('hidden');
+            estadoVazio.classList.remove('flex');
 
-            // ============ TOAST ============
-            function showToast(message, isError = false) {
-                clearTimeout(toastTimeout);
-                toastMsg.textContent = message;
-                toastIcon.textContent = isError ? '⚠️' : '✅';
-                toast.classList.remove('show', 'error-toast');
-                if (isError) toast.classList.add('error-toast');
-                // Force reflow
-                void toast.offsetWidth;
-                toast.classList.add('show');
-                toastTimeout = setTimeout(() => {
-                    toast.classList.remove('show');
-                }, 3000);
-            }
+            grid.innerHTML = '';
 
-            // ============ PET TYPE SELECTOR ============
-            petTypeSelector.addEventListener('click', function(e) {
-                const option = e.target.closest('.pet-type-option');
-                if (!option) return;
-                document.querySelectorAll('.pet-type-option').forEach(o => o.classList.remove(
-                    'selected'));
-                option.classList.add('selected');
-                petTypeInput.value = option.dataset.type;
-                errorType.classList.remove('visible');
+            lista.forEach(pet => {
+                const badgeEspecieCor = getEspecieBadgeCor(pet.especie);
+                const badgeGenero = pet.genero === 'Macho' 
+                    ? '<span class="text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1"><i data-lucide="mars" class="w-3 h-3"></i> Macho</span>' 
+                    : '<span class="text-pink-600 bg-pink-50 px-2 py-0.5 rounded-full text-xs font-semibold flex items-center gap-1"><i data-lucide="venus" class="w-3 h-3"></i> Fêmea</span>';
+
+                const cardHtml = `
+                    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition-shadow flex flex-col group">
+                        <!-- Imagem do Pet -->
+                        <div class="h-48 w-full overflow-hidden relative bg-slate-100">
+                            <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                                 src="${pet.fotoUrl || 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80&w=400'}" 
+                                 onerror="this.src='https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80&w=400'" 
+                                 alt="${pet.nome}">
+                            <!-- Badge de Espécie -->
+                            <span class="absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${badgeEspecieCor} shadow-sm">
+                                ${pet.especie}
+                            </span>
+                        </div>
+
+                        <!-- Detalhes rápidos -->
+                        <div class="p-5 flex-grow flex flex-col justify-between">
+                            <div>
+                                <div class="flex items-center justify-between gap-2 mb-1">
+                                    <h4 class="text-lg font-bold text-slate-800">${pet.nome}</h4>
+                                    <div class="flex gap-1">
+                                        ${badgeGenero}
+                                    </div>
+                                </div>
+                                
+                                <p class="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-3">${pet.raca}</p>
+
+                                <div class="flex items-center gap-2 mb-4">
+                                    <span class="bg-slate-100 text-slate-600 text-xs font-medium px-2 py-1 rounded-lg">${pet.idade} ${pet.unidadeIdade}</span>
+                                    <span class="bg-slate-100 text-slate-600 text-xs font-medium px-2 py-1 rounded-lg">Porte ${pet.porte}</span>
+                                </div>
+
+                                <!-- Temperamento -->
+                                <div class="flex flex-wrap gap-1 mb-4">
+                                    ${(pet.temperamento || []).slice(0, 3).map(temp => `
+                                        <span class="bg-brand-50 text-brand-700 text-[10px] font-bold px-2 py-0.5 rounded-full">${temp}</span>
+                                    `).join('')}
+                                    ${(pet.temperamento || []).length > 3 ? `<span class="bg-slate-100 text-slate-500 text-[10px] font-bold px-2 py-0.5 rounded-full">+${pet.temperamento.length - 3}</span>` : ''}
+                                </div>
+                            </div>
+
+                            <!-- Botões de Ação do Card -->
+                            <div class="pt-4 border-t border-slate-50 flex items-center justify-between gap-2 mt-auto">
+                                <button onclick="verDetalhes('${pet.id}')" class="flex items-center gap-1.5 text-xs font-bold text-brand-600 hover:text-brand-700 py-1.5 px-3 rounded-lg hover:bg-brand-50 transition-colors">
+                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                    <span>Ver detalhes</span>
+                                </button>
+                                <div class="flex gap-1">
+                                    <button onclick="editarPet('${pet.id}')" class="text-slate-400 hover:text-slate-700 p-2 hover:bg-slate-50 rounded-lg transition-colors" title="Editar">
+                                        <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                    </button>
+                                    <button onclick="confirmarExclusao('${pet.id}')" class="text-red-400 hover:text-red-600 p-2 hover:bg-red-50 rounded-lg transition-colors" title="Excluir">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.insertAdjacentHTML('beforeend', cardHtml);
             });
 
-            // ============ FORM VALIDATION ============
-            function clearErrors() {
-                [errorName, errorAge, errorOwner, errorPhone, errorEmail, errorType].forEach(el => el
-                    .classList.remove('visible'));
-                [petName, petAge, ownerName, ownerPhone, ownerEmail].forEach(el => el.classList.remove(
-                    'error'));
+            lucide.createIcons();
+        }
+
+        // Atualizar Métricas do Topo
+        function atualizarEstatisticas() {
+            document.getElementById('stat-total').innerText = pets.length;
+            
+            const caes = pets.filter(p => p.especie === 'Cachorro').length;
+            document.getElementById('stat-caes').innerText = caes;
+
+            const gatos = pets.filter(p => p.especie === 'Gato').length;
+            document.getElementById('stat-gatos').innerText = gatos;
+
+            // Média de Idade (convertendo provisoriamente meses para fração de ano para cálculo)
+            if (pets.length > 0) {
+                const somaAnos = pets.reduce((acc, p) => {
+                    const idadeAno = p.unidadeIdade === 'Anos' ? parseFloat(p.idade) : parseFloat(p.idade) / 12;
+                    return acc + idadeAno;
+                }, 0);
+                const media = (somaAnos / pets.length).toFixed(1);
+                document.getElementById('stat-idade').innerText = `${media} ${media == 1 ? 'ano' : 'anos'}`;
+            } else {
+                document.getElementById('stat-idade').innerText = `0 anos`;
             }
+        }
 
-            function validateForm() {
-                clearErrors();
-                let isValid = true;
-
-                if (!petTypeInput.value) {
-                    errorType.classList.add('visible');
-                    isValid = false;
-                }
-
-                const nameVal = petName.value.trim();
-                if (!nameVal || nameVal.length < 2) {
-                    errorName.classList.add('visible');
-                    petName.classList.add('error');
-                    isValid = false;
-                }
-
-                const ageVal = petAge.value.trim();
-                if (!ageVal) {
-                    errorAge.classList.add('visible');
-                    petAge.classList.add('error');
-                    isValid = false;
-                }
-
-                const ownerVal = ownerName.value.trim();
-                if (!ownerVal || ownerVal.length < 2) {
-                    errorOwner.classList.add('visible');
-                    ownerName.classList.add('error');
-                    isValid = false;
-                }
-
-                const phoneVal = ownerPhone.value.trim();
-                const phoneClean = phoneVal.replace(/\D/g, '');
-                if (!phoneVal || phoneClean.length < 8) {
-                    errorPhone.classList.add('visible');
-                    ownerPhone.classList.add('error');
-                    isValid = false;
-                }
-
-                const emailVal = ownerEmail.value.trim();
-                if (emailVal && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
-                    errorEmail.classList.add('visible');
-                    ownerEmail.classList.add('error');
-                    isValid = false;
-                }
-
-                return isValid;
+        // Definir cores para os crachás de espécie
+        function getEspecieBadgeCor(especie) {
+            switch(especie) {
+                case 'Cachorro': return 'bg-amber-100 text-amber-800';
+                case 'Gato': return 'bg-purple-100 text-purple-800';
+                case 'Ave': return 'bg-teal-100 text-teal-800';
+                case 'Roedor': return 'bg-indigo-100 text-indigo-800';
+                default: return 'bg-slate-200 text-slate-800';
             }
+        }
 
-            // ============ PHONE MASK ============
-            ownerPhone.addEventListener('input', function() {
-                let val = this.value.replace(/\D/g, '');
-                if (val.length > 11) val = val.slice(0, 11);
-                if (val.length >= 7) {
-                    val = val.replace(/^(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3');
-                } else if (val.length >= 3) {
-                    val = val.replace(/^(\d{2})(\d+)/, '($1) $2');
+        // Mostrar / Esconder Modal Cadastro
+        function abrirModalCadastro() {
+            document.getElementById('form-pet').reset();
+            document.getElementById('pet-id').value = '';
+            document.getElementById('modal-titulo').innerText = 'Novo Cadastro de Pet';
+            document.getElementById('modal-icon').setAttribute('data-lucide', 'plus-circle');
+            
+            temperamentosSelecionados = [];
+            atualizarChipsTemperamento();
+            ajustarSugestoesRaca();
+
+            const modal = document.getElementById('modal-cadastro');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.transform').classList.remove('scale-95');
+            }, 50);
+
+            lucide.createIcons();
+        }
+
+        function fecharModalCadastro() {
+            const modal = document.getElementById('modal-cadastro');
+            modal.classList.add('opacity-0');
+            modal.querySelector('.transform').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Controle dos Temperamentos (Multiselect)
+        function toggleTemperamento(valor, elemento) {
+            const index = temperamentosSelecionados.indexOf(valor);
+            if (index > -1) {
+                temperamentosSelecionados.splice(index, 1);
+                elemento.classList.remove('bg-brand-500', 'text-white', 'border-brand-500');
+                elemento.classList.add('bg-slate-50', 'text-slate-600', 'border-slate-200');
+            } else {
+                temperamentosSelecionados.push(valor);
+                elemento.classList.add('bg-brand-500', 'text-white', 'border-brand-500');
+                elemento.classList.remove('bg-slate-50', 'text-slate-600', 'border-slate-200');
+            }
+            document.getElementById('pet-temperamento').value = temperamentosSelecionados.join(',');
+        }
+
+        function atualizarChipsTemperamento() {
+            const botoes = document.querySelectorAll('.btn-temp');
+            botoes.forEach(btn => {
+                const valor = btn.innerText;
+                if (temperamentosSelecionados.includes(valor)) {
+                    btn.classList.add('bg-brand-500', 'text-white', 'border-brand-500');
+                    btn.classList.remove('bg-slate-50', 'text-slate-600', 'border-slate-200');
+                } else {
+                    btn.classList.remove('bg-brand-500', 'text-white', 'border-brand-500');
+                    btn.classList.add('bg-slate-50', 'text-slate-600', 'border-slate-200');
                 }
-                this.value = val;
             });
+            document.getElementById('pet-temperamento').value = temperamentosSelecionados.join(',');
+        }
 
-            // ============ CRUD ============
-            function addPet(petData) {
-                const pet = {
-                    id: Date.now().toString(),
-                    type: petData.type,
-                    name: petData.name.trim(),
-                    breed: petData.breed.trim(),
-                    age: petData.age.trim(),
-                    ownerName: petData.ownerName.trim(),
-                    ownerPhone: petData.ownerPhone.trim(),
-                    ownerEmail: petData.ownerEmail.trim(),
-                    createdAt: new Date().toISOString(),
-                };
-                pets.unshift(pet);
-                savePets();
-                return pet;
+        // Sugestões automáticas de fotos e raças dependendo da espécie
+        function ajustarSugestoesRaca() {
+            const especie = document.getElementById('pet-especie').value;
+            const containerImagens = document.getElementById('sugestoes-imagens');
+            const placeholderRaca = document.getElementById('pet-raca');
+            
+            containerImagens.innerHTML = '';
+
+            if (!especie) {
+                placeholderRaca.placeholder = "Selecione uma espécie primeiro";
+                return;
             }
 
-            function updatePet(id, petData) {
+            // Mudar placeholder de raça sugestivo
+            if (especie === 'Cachorro') placeholderRaca.placeholder = "Ex: Golden Retriever, Srd, Bulldog...";
+            else if (especie === 'Gato') placeholderRaca.placeholder = "Ex: Persa, Siamês, Srd, Maine Coon...";
+            else if (especie === 'Ave') placeholderRaca.placeholder = "Ex: Calopsita, Canário, Papagaio...";
+            else if (especie === 'Roedor') placeholderRaca.placeholder = "Ex: Hamster, Porquinho-da-índia...";
+            else placeholderRaca.placeholder = "Ex: Jabuti, Mini-pig, etc...";
+
+            // Carregar fotos recomendadas
+            const imagens = imagensPadrao[especie] || imagensPadrao['Outro'];
+            imagens.forEach((url, index) => {
+                const imgHtml = `
+                    <button type="button" onclick="selecionarFotoSugerida('${url}')" class="h-12 w-full rounded-lg overflow-hidden border-2 border-transparent hover:border-brand-500 focus:outline-none focus:border-brand-500 transition-all">
+                        <img src="${url}" class="w-full h-full object-cover" alt="Opção ${index + 1}">
+                    </button>
+                `;
+                containerImagens.insertAdjacentHTML('beforeend', imgHtml);
+            });
+        }
+
+        function selecionarFotoSugerida(url) {
+            document.getElementById('pet-foto-url').value = url;
+            mostrarToast('Foto selecionada com sucesso!', 'check-circle');
+        }
+
+        // Salvar Informações de Pet (Cadastrar ou Editar)
+        function salvarPet(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('pet-id').value;
+            const nome = document.getElementById('pet-nome').value.trim();
+            const especie = document.getElementById('pet-especie').value;
+            const raca = document.getElementById('pet-raca').value.trim();
+            const idade = document.getElementById('pet-idade').value;
+            const unidadeIdade = document.getElementById('pet-unidade-idade').value;
+            const porte = document.getElementById('pet-porte').value;
+            const genero = document.getElementById('pet-genero').value;
+            const obs = document.getElementById('pet-obs').value.trim();
+            let fotoUrl = document.getElementById('pet-foto-url').value.trim();
+
+            // Se nenhuma foto foi definida, usa uma padrão fofa de acordo com espécie
+            if (!fotoUrl) {
+                const fotosEspecie = imagensPadrao[especie] || imagensPadrao['Outro'];
+                fotoUrl = fotosEspecie[Math.floor(Math.random() * fotosEspecie.length)];
+            }
+
+            if (id) {
+                // Modo Edição
                 const index = pets.findIndex(p => p.id === id);
-                if (index === -1) return null;
-                pets[index] = {
-                    ...pets[index],
-                    type: petData.type,
-                    name: petData.name.trim(),
-                    breed: petData.breed.trim(),
-                    age: petData.age.trim(),
-                    ownerName: petData.ownerName.trim(),
-                    ownerPhone: petData.ownerPhone.trim(),
-                    ownerEmail: petData.ownerEmail.trim(),
+                if (index > -1) {
+                    pets[index] = { id, nome, especie, raca, idade: parseInt(idade), unidadeIdade, porte, genero, temperamento: [...temperamentosSelecionados], fotoUrl, obs };
+                    mostrarToast('Cadastro atualizado com sucesso!', 'edit-2');
+                }
+            } else {
+                // Modo Criação
+                const novoPet = {
+                    id: Date.now().toString(),
+                    nome,
+                    especie,
+                    raca,
+                    idade: parseInt(idade),
+                    unidadeIdade,
+                    porte,
+                    genero,
+                    temperamento: [...temperamentosSelecionados],
+                    fotoUrl,
+                    obs
                 };
-                savePets();
-                return pets[index];
+                pets.unshift(novoPet);
+                mostrarToast('Pet cadastrado com sucesso!', 'sparkles');
             }
 
-            function deletePet(id) {
+            salvarLocalStorage();
+            renderizarPets();
+            fecharModalCadastro();
+        }
+
+        // Editar Pet
+        function editarPet(id) {
+            const pet = pets.find(p => p.id === id);
+            if (!pet) return;
+
+            // Fechar modal detalhes caso esteja aberto
+            fecharModalDetalhes();
+
+            document.getElementById('pet-id').value = pet.id;
+            document.getElementById('pet-nome').value = pet.nome;
+            document.getElementById('pet-especie').value = pet.especie;
+            ajustarSugestoesRaca();
+            
+            document.getElementById('pet-raca').value = pet.raca;
+            document.getElementById('pet-idade').value = pet.idade;
+            document.getElementById('pet-unidade-idade').value = pet.unidadeIdade;
+            document.getElementById('pet-porte').value = pet.porte;
+            document.getElementById('pet-genero').value = pet.genero;
+            document.getElementById('pet-obs').value = pet.obs || '';
+            document.getElementById('pet-foto-url').value = pet.fotoUrl;
+
+            temperamentosSelecionados = [...(pet.temperamento || [])];
+            atualizarChipsTemperamento();
+
+            document.getElementById('modal-titulo').innerText = 'Editar Cadastro';
+            document.getElementById('modal-icon').setAttribute('data-lucide', 'edit-3');
+
+            // Abrir modal
+            const modal = document.getElementById('modal-cadastro');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.transform').classList.remove('scale-95');
+            }, 50);
+
+            lucide.createIcons();
+        }
+
+        // Ver Detalhes Completos
+        function verDetalhes(id) {
+            const pet = pets.find(p => p.id === id);
+            if (!pet) return;
+
+            document.getElementById('detalhe-nome').innerText = pet.nome;
+            document.getElementById('detalhe-especie').innerText = pet.especie;
+            document.getElementById('detalhe-especie').className = `px-2.5 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wider ${getEspecieBadgeCor(pet.especie)}`;
+            document.getElementById('detalhe-raca').innerText = pet.raca;
+            document.getElementById('detalhe-idade').innerText = `${pet.idade} ${pet.unidadeIdade}`;
+            document.getElementById('detalhe-genero').innerText = pet.genero;
+            document.getElementById('detalhe-porte').innerText = pet.porte;
+            document.getElementById('detalhe-obs').innerText = pet.obs || 'Nenhuma observação ou cuidado especial registrado.';
+            
+            document.getElementById('detalhe-imagem').src = pet.fotoUrl || 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?auto=format&fit=crop&q=80&w=400';
+
+            // Configurar botões internos do modal
+            document.getElementById('detalhe-btn-excluir').onclick = () => confirmarExclusao(pet.id);
+            document.getElementById('detalhe-btn-editar').onclick = () => editarPet(pet.id);
+
+            // Temperamentos
+            const containerTemp = document.getElementById('detalhe-temperamento');
+            containerTemp.innerHTML = '';
+            if (pet.temperamento && pet.temperamento.length > 0) {
+                pet.temperamento.forEach(temp => {
+                    containerTemp.insertAdjacentHTML('beforeend', `
+                        <span class="bg-brand-50 text-brand-700 text-xs font-semibold px-2.5 py-1 rounded-full border border-brand-100">${temp}</span>
+                    `);
+                });
+            } else {
+                containerTemp.innerHTML = '<span class="text-xs text-slate-400">Nenhum comportamento registrado</span>';
+            }
+
+            // Exibir modal detalhes
+            const modal = document.getElementById('modal-detalhes');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.querySelector('.transform').classList.remove('scale-95');
+            }, 50);
+
+            lucide.createIcons();
+        }
+
+        function fecharModalDetalhes() {
+            const modal = document.getElementById('modal-detalhes');
+            modal.classList.add('opacity-0');
+            modal.querySelector('.transform').classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Excluir Pet
+        function confirmarExclusao(id) {
+            const pet = pets.find(p => p.id === id);
+            if (!pet) return;
+
+            // Substituir o alert/confirm nativo do navegador por uma solução no próprio app
+            const confirmacao = confirm(`Deseja mesmo remover o cadastro do(a) ${pet.nome}? Esta ação é irreversível.`);
+            if (confirmacao) {
                 pets = pets.filter(p => p.id !== id);
-                savePets();
+                salvarLocalStorage();
+                renderizarPets();
+                fecharModalDetalhes();
+                mostrarToast('Cadastro excluído com sucesso!', 'trash');
             }
+        }
 
-            function getPetById(id) {
-                return pets.find(p => p.id === id);
-            }
+        // Filtros e Busca em Tempo Real
+        function filtrarPets() {
+            const busca = document.getElementById('input-busca').value.toLowerCase().trim();
+            const especie = document.getElementById('filtro-especie').value;
+            const porte = document.getElementById('filtro-porte').value;
 
-            // ============ RENDER ============
-            function getTypeEmoji(type) {
-                const map = { dog: '🐕', cat: '🐈', bird: '🐦', fish: '🐟', other: '🐹' };
-                return map[type] || '🐾';
-            }
+            const resultado = pets.filter(pet => {
+                const correspondeBusca = 
+                    pet.nome.toLowerCase().includes(busca) || 
+                    pet.raca.toLowerCase().includes(busca) || 
+                    (pet.temperamento || []).some(t => t.toLowerCase().includes(busca));
+                
+                const correspondeEspecie = especie === '' || pet.especie === especie;
+                const correspondePorte = porte === '' || pet.porte === porte;
 
-            function getTypeBadgeClass(type) {
-                const map = { dog: 'badge-dog', cat: 'badge-cat', bird: 'badge-bird', fish: 'badge-fish',
-                    other: 'badge-other' };
-                return map[type] || 'badge-other';
-            }
-
-            function getTypeLabel(type) {
-                const map = { dog: 'Cachorro', cat: 'Gato', bird: 'Ave', fish: 'Peixe', other: 'Outro' };
-                return map[type] || 'Outro';
-            }
-
-            function getAvatarClass(type) {
-                const map = { dog: 'dog', cat: 'cat', bird: 'bird', fish: 'fish', other: 'other' };
-                return map[type] || 'other';
-            }
-
-            function renderTable(filteredPets) {
-                const data = filteredPets !== undefined ? filteredPets : getFilteredPets();
-
-                if (data.length === 0) {
-                    petsTableBody.innerHTML = `
-                        <tr class="empty-state">
-                            <td colspan="7">
-                                <span class="empty-emoji">🐾</span>
-                                <p>Nenhum pet cadastrado ainda</p>
-                                <p style="font-size:0.8rem;">Cadastre o primeiro pet no formulário ao lado!</p>
-                            </td>
-                        </tr>`;
-                } else {
-                    petsTableBody.innerHTML = data.map(pet => `
-                        <tr data-id="${pet.id}">
-                            <td>
-                                <div class="pet-avatar-cell">
-                                    <div class="pet-mini-avatar ${getAvatarClass(pet.type)}">${getTypeEmoji(pet.type)}</div>
-                                    <strong>${escapeHtml(pet.name)}</strong>
-                                </div>
-                            </td>
-                            <td><span class="badge ${getTypeBadgeClass(pet.type)}">${getTypeLabel(pet.type)}</span></td>
-                            <td>${escapeHtml(pet.breed) || '—'}</td>
-                            <td>${escapeHtml(pet.age)}</td>
-                            <td>${escapeHtml(pet.ownerName)}</td>
-                            <td>${escapeHtml(pet.ownerPhone)}</td>
-                            <td>
-                                <div class="actions-cell">
-                                    <button class="btn btn-edit btn-sm" onclick="window._editPet('${pet.id}')" title="Editar">✏️</button>
-                                    <button class="btn btn-delete btn-sm" onclick="window._confirmDelete('${pet.id}')" title="Excluir">🗑️</button>
-                                </div>
-                            </td>
-                        </tr>
-                    `).join('');
-                }
-                updateStats();
-            }
-
-            function escapeHtml(str) {
-                const div = document.createElement('div');
-                div.textContent = str;
-                return div.innerHTML;
-            }
-
-            function getFilteredPets() {
-                const searchTerm = searchInput.value.toLowerCase().trim();
-                const typeFilter = filterType.value;
-                return pets.filter(pet => {
-                    const matchesSearch =
-                        !searchTerm ||
-                        pet.name.toLowerCase().includes(searchTerm) ||
-                        pet.breed.toLowerCase().includes(searchTerm) ||
-                        pet.ownerName.toLowerCase().includes(searchTerm) ||
-                        pet.ownerPhone.includes(searchTerm);
-                    const matchesType = typeFilter === 'all' || pet.type === typeFilter;
-                    return matchesSearch && matchesType;
-                });
-            }
-
-            function updateStats() {
-                statTotal.textContent = pets.length;
-                statDogs.textContent = pets.filter(p => p.type === 'dog').length;
-                statCats.textContent = pets.filter(p => p.type === 'cat').length;
-                statOthers.textContent = pets.filter(p => !['dog', 'cat'].includes(p.type)).length;
-            }
-
-            // ============ FORM HANDLING ============
-            function resetForm() {
-                petForm.reset();
-                editId.value = '';
-                petTypeInput.value = 'dog';
-                document.querySelectorAll('.pet-type-option').forEach(o => o.classList.remove('selected'));
-                const dogOption = document.querySelector('.pet-type-option[data-type="dog"]');
-                if (dogOption) dogOption.classList.add('selected');
-                submitBtn.textContent = '💾 Salvar Pet';
-                formTitle.textContent = 'Cadastrar Pet';
-                cancelBtn.style.display = 'none';
-                clearErrors();
-                petName.focus();
-            }
-
-            function populateForm(pet) {
-                editId.value = pet.id;
-                petTypeInput.value = pet.type;
-                document.querySelectorAll('.pet-type-option').forEach(o => {
-                    o.classList.remove('selected');
-                    if (o.dataset.type === pet.type) o.classList.add('selected');
-                });
-                petName.value = pet.name;
-                petBreed.value = pet.breed || '';
-                petAge.value = pet.age;
-                ownerName.value = pet.ownerName;
-                ownerPhone.value = pet.ownerPhone;
-                ownerEmail.value = pet.ownerEmail || '';
-                submitBtn.textContent = '✏️ Atualizar Pet';
-                formTitle.textContent = 'Editar Pet';
-                cancelBtn.style.display = 'block';
-                clearErrors();
-                // Scroll to form
-                document.getElementById('formCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-
-            petForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                if (!validateForm()) return;
-
-                const petData = {
-                    type: petTypeInput.value,
-                    name: petName.value,
-                    breed: petBreed.value,
-                    age: petAge.value,
-                    ownerName: ownerName.value,
-                    ownerPhone: ownerPhone.value,
-                    ownerEmail: ownerEmail.value,
-                };
-
-                if (editId.value) {
-                    // Update
-                    const updated = updatePet(editId.value, petData);
-                    if (updated) {
-                        showToast('🐾 Pet atualizado com sucesso!');
-                        highlightRow(editId.value);
-                    }
-                } else {
-                    // Create
-                    const newPet = addPet(petData);
-                    showToast('🎉 Pet cadastrado com sucesso!');
-                    highlightRow(newPet.id);
-                }
-
-                resetForm();
-                renderTable();
+                return correspondeBusca && correspondeEspecie && correspondePorte;
             });
 
-            cancelBtn.addEventListener('click', resetForm);
+            renderizarPets(resultado);
+        }
 
-            function highlightRow(id) {
-                setTimeout(() => {
-                    const row = document.querySelector(`tr[data-id="${id}"]`);
-                    if (row) {
-                        row.classList.add('highlight-row');
-                        row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        setTimeout(() => row.classList.remove('highlight-row'), 900);
-                    }
-                }, 100);
+        function limparFiltros() {
+            document.getElementById('input-busca').value = '';
+            document.getElementById('filtro-especie').value = '';
+            document.getElementById('filtro-porte').value = '';
+            renderizarPets();
+            mostrarToast('Filtros redefinidos', 'filter-x');
+        }
+
+        // Exportação dos dados para JSON
+        function exportarDados() {
+            if (pets.length === 0) {
+                mostrarToast('Não há pets para exportar.', 'alert-circle');
+                return;
             }
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pets, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `petcare_pets_export_${Date.now()}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            mostrarToast('Dados exportados com sucesso!', 'download');
+        }
 
-            // ============ DELETE MODAL ============
-            window._confirmDelete = function(id) {
-                const pet = getPetById(id);
-                if (!pet) return;
-                pendingDeleteId = id;
-                deletePetName.textContent = pet.name;
-                deleteModal.classList.add('active');
-            };
+        // Sistema de Feedback Visual (Toast Notificação)
+        function mostrarToast(mensagem, icone = 'check-circle') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            const toastIcon = document.getElementById('toast-icon');
 
-            confirmDeleteBtn.addEventListener('click', function() {
-                if (pendingDeleteId) {
-                    const pet = getPetById(pendingDeleteId);
-                    const name = pet ? pet.name : 'Pet';
-                    deletePet(pendingDeleteId);
-                    savePets();
-                    renderTable();
-                    showToast(`🗑️ "${name}" foi removido.`);
-                    if (editId.value === pendingDeleteId) resetForm();
-                    pendingDeleteId = null;
-                }
-                deleteModal.classList.remove('active');
-            });
+            toastMsg.innerText = mensagem;
+            toastIcon.setAttribute('data-lucide', icone);
+            lucide.createIcons();
 
-            cancelDeleteBtn.addEventListener('click', function() {
-                pendingDeleteId = null;
-                deleteModal.classList.remove('active');
-            });
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
 
-            deleteModal.addEventListener('click', function(e) {
-                if (e.target === deleteModal) {
-                    pendingDeleteId = null;
-                    deleteModal.classList.remove('active');
-                }
-            });
-
-            // ============ EDIT (global function) ============
-            window._editPet = function(id) {
-                const pet = getPetById(id);
-                if (!pet) return;
-                populateForm(pet);
-            };
-
-            // ============ SEARCH & FILTER ============
-            searchInput.addEventListener('input', () => renderTable());
-            filterType.addEventListener('change', () => renderTable());
-
-            // ============ KEYBOARD SHORTCUTS ============
-            document.addEventListener('keydown', function(e) {
-                // Escape to close modal or cancel edit
-                if (e.key === 'Escape') {
-                    if (deleteModal.classList.contains('active')) {
-                        pendingDeleteId = null;
-                        deleteModal.classList.remove('active');
-                    } else if (editId.value) {
-                        resetForm();
-                    }
-                }
-            });
-
-            // ============ INIT ============
-            function init() {
-                loadPets();
-                renderTable();
-                resetForm();
-                // Focus on name field
-                setTimeout(() => petName.focus(), 300);
-            }
-
-            init();
-
-            console.log('🐾 PetCad iniciado com sucesso!');
-            console.log(`   ${pets.length} pets carregados do armazenamento local.`);
-            console.log('   Dica: Use a busca e o filtro para encontrar pets rapidamente!');
-        })();
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
     </script>
 </body>
 </html>
